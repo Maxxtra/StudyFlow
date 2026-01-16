@@ -254,7 +254,6 @@ fun AddSubjectDialog(
     var subjectName by remember { mutableStateOf("") }
     var selectedColor by remember { mutableStateOf(Color.Blue) }
     var showColorPicker by remember { mutableStateOf(false) }
-
     val colors = listOf(
         Color.Red, Color.Blue, Color.Green, Color.Yellow,
         Color.Magenta, Color.Cyan, Color(0xFFFF9800), Color(0xFF9C27B0)
