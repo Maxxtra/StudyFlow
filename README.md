@@ -1,107 +1,133 @@
-StudyFlow is an Android school project built with Kotlin and Jetpack Compose. It is a smart study planner that helps students manage subjects and study tasks homework projects exams and generates an automatic daily plan based on priority instead of using a simple static to do list.
+README_MD = """# StudyFlow
 
-What the app does
-The user can create subjects and then add study tasks linked to a subject. Each task has a title description type deadline estimated time and difficulty. The app shows active tasks upcoming deadlines and also keeps a history of completed tasks. The Home screen highlights the daily plan generated automatically using a scheduling algorithm that considers deadline difficulty and estimated time. The user can also mark tasks as completed set a task as in progress edit tasks and delete tasks. Settings allow configuring daily study hours and default values used when creating new tasks.
+## Overview
+StudyFlow is an Android school project built with Kotlin and Jetpack Compose. It is a smart study planner for students that helps organize subjects and academic tasks (homework, projects, exams) and generates an automatic daily plan based on task priority rather than a static to-do list.
 
-Project structure overview based on the zip
-The project is a standard Android Studio Gradle project with a single app module.
+This repository follows an incremental development approach. The commit history is intentionally structured to reflect step-by-step implementation (setup -> UI -> data -> domain -> features).
 
-Root level
-build.gradle.kts and settings.gradle.kts hold the global Gradle configuration
-gradle folder and libs.versions.toml handle dependency versions using Version Catalog
+## Current Release
+- v1.0.0 (initial functional release)
 
-app module
-app/src/main contains all application code and resources
+## Key Features
+- Subjects management
+  - Create and manage subjects
+  - Subject color selection (RGB picker)
+  - Search bar and alphabetical sorting for subjects
 
-Core packages and responsibilities
+- Tasks management
+  - Create tasks linked to a subject
+  - Task types: homework, project, exam, other
+  - Task fields: title, description, deadline, estimated time, difficulty
+  - Edit and delete tasks
+  - Required field validation and user-friendly error messages
+  - Task detail screen
 
-com.example.studyflow
-MainActivity.kt
-Entry point of the app. Sets up the Compose UI theme and creates the Scaffold with the bottom navigation bar. It also creates the NavController and wires navigation between screens.
+- Task status tracking
+  - Mark tasks as completed (with confirmation dialogs)
+  - Mark tasks as in progress (with visual indicators)
+  - Overdue task visual indicators
+  - History screen for completed tasks
 
-StudyFlowApplication.kt
-Application class used as a simple dependency container. It initializes the Room database and exposes repositories plus the SettingsDataStore so ViewModels can be created with factories.
+- Smart daily planning
+  - Home screen displays an automatically generated daily plan
+  - Priority algorithm considers deadline urgency, difficulty, and estimated time
+  - Plan allocation uses the daily available study time configured in settings
 
-data layer
-com.example.studyflow.data.database
-StudyFlowDatabase.kt
-Room database configuration. Contains Subject and StudyTask as entities and provides DAOs. Uses fallbackToDestructiveMigration for development simplicity.
+- Settings
+  - Daily study time preferences
+  - Default difficulty and default estimated time used when creating tasks
 
-Entities in data.database.entities
-Subject
-Represents a course subject name and color.
-StudyTask
-Represents a study item homework project exam or other. Includes deadline estimatedTimeMinutes difficulty completion state inProgress completedAt createdAt and a priority field stored in DB.
-TaskType
-Enum for HOMEWORK PROJECT EXAM OTHER
+## Tech Stack
+- Kotlin
+- Jetpack Compose (UI)
+- Material 3 (design system)
+- Navigation Compose (screen navigation)
+- ViewModel + StateFlow (reactive UI state)
+- Coroutines (asynchronous work)
+- Room (local persistence)
+- DataStore (user preferences)
 
-DAOs in data.database.dao
-SubjectDao
-CRUD operations for subjects.
-StudyTaskDao
-CRUD operations for tasks plus queries for all tasks active tasks completed tasks tasks by subject tasks by type tasks between dates and update helpers for completion inProgress and priority.
+## Project Structure
+This is a standard Android Studio Gradle project with a single app module.
 
-Converters.kt
-Room type converters used for persisting non primitive types such as enums.
+### Root level
+- build.gradle.kts, settings.gradle.kts, gradle.properties
+- gradle/ and libs.versions.toml (Version Catalog)
+- gradlew / gradlew.bat (Gradle wrapper)
 
-com.example.studyflow.data.datastore
-SettingsDataStore.kt
-DataStore Preferences used for app settings. Stores daily study hours default difficulty and default estimated time. Exposes them as Flow and provides suspend setters.
+### App module
+- app/src/main/java/com/example/studyflow
+  - MainActivity.kt (app entry point, sets up Compose + navigation)
+  - StudyFlowApplication.kt (initializes database and repositories)
 
-com.example.studyflow.data.repository
-SubjectRepository.kt and StudyTaskRepository.kt
-Repositories wrap the DAOs and expose Flow streams to the UI layer. They also provide suspend functions for insert update delete and specific updates like completion inProgress and priority.
+- app/src/main/java/com/example/studyflow/data
+  - database/
+    - entities/ (Subject, StudyTask, TaskType)
+    - dao/ (SubjectDao, StudyTaskDao)
+    - StudyFlowDatabase.kt (Room database)
+  - repository/ (SubjectRepository, StudyTaskRepository)
+  - datastore/ (SettingsDataStore)
 
-domain layer
-com.example.studyflow.domain.scheduler
-TaskScheduler.kt
-This is the core logic that makes the app “smart”. It computes a priority score for each active task using a mix of urgency days until deadline difficulty and estimated time. It then generates a DailyPlan by sorting tasks by priority and allocating available minutes for the day until the daily time budget is used. It also includes a weekly plan helper that generates plans for 7 days.
+- app/src/main/java/com/example/studyflow/domain
+  - model/ (DailyPlan, PlannedTask)
+  - scheduler/ (TaskScheduler)
 
-com.example.studyflow.domain.model
-DailyPlan and PlannedTask
-Data models used by the scheduler. DailyPlan contains the date a list of planned tasks and the total allocated minutes. PlannedTask links a StudyTask with allocatedMinutes and a computed priority.
+- app/src/main/java/com/example/studyflow/ui
+  - theme/ (Color, Type, Theme)
+  - navigation/ (Screen routes, NavGraph)
+  - viewmodel/ (MainViewModel, TaskViewModel, SubjectViewModel, SettingsViewModel, ViewModelFactory)
+  - components/ (TaskCard)
+  - screens/ (Home, AllTasks, AddTask, EditTask, Subjects, TaskDetail, History, Settings)
 
-ui layer
-com.example.studyflow.ui.navigation
-Screen.kt defines all app routes
-NavGraph.kt defines the Navigation Compose graph and maps routes to screens including routes with taskId for details and edit
+## Architecture Summary
+StudyFlow uses a simple layered structure:
+- Data layer: Room stores subjects and tasks; DataStore stores user settings
+- Domain layer: TaskScheduler computes task priorities and generates the daily plan
+- UI layer: Compose screens + Navigation + ViewModels expose features and reactive state
 
-com.example.studyflow.ui.viewmodel
-MainViewModel
-Collects all tasks from the repository and dailyStudyHours from settings then computes the daily plan using TaskScheduler. It also updates task priority in the database and exposes MainUiState to the UI. Handles actions like toggle completion toggle in progress and delete.
-TaskViewModel
-Holds the state of the add edit task form. Loads default difficulty and estimated time from SettingsDataStore. Provides functions to update form fields and save or update tasks.
-SubjectViewModel
-Manages the subject list and subject CRUD operations.
-SettingsViewModel
-Reads and writes settings through DataStore and exposes SettingsUiState.
-ViewModelFactory.kt
-Factories used to create ViewModels with repositories and DataStore injected from StudyFlowApplication.
+## Development History (Commit-Based Roadmap)
+The repository commit history is organized as a guide for how the project was built.
 
-com.example.studyflow.ui.screens
-HomeScreen
-Shows the automatically generated daily plan and quick access to important tasks.
-AllTasksScreen
-Shows the full organized task list with navigation to details and add.
-TaskDetailScreen
-Shows full information about one task and actions like complete delete edit.
-AddTaskScreen and EditTaskScreen
-Forms for creating and editing tasks using TaskViewModel.
-SubjectsScreen
-Subject management add delete update subjects.
-HistoryScreen
-Shows completed tasks history.
-SettingsScreen
-Shows and edits daily study hours and default values.
+### Phase 1: Project setup
+1. Initial project setup
+2. Add Android app module configuration
+3. Add Jetpack Compose and Material3 dependencies
+4. Setup Material3 theme and colors
 
-com.example.studyflow.ui.components
-TaskCard.kt
-Reusable Compose component to render a task with its main properties and actions in a consistent UI style.
+### Phase 2: Persistence (Room)
+5. Create database entities for tasks and subjects
+6. Add Room database dependencies and KSP configuration
+7. Implement Room DAOs for tasks and subjects
+8. Setup Room database with version control
+9. Implement repository pattern for data abstraction
 
-com.example.studyflow.ui.theme
-Theme files for Material 3 styling Color Type and Theme.
+### Phase 3: Settings (DataStore)
+10. Add DataStore for user preferences storage
 
-In short the core of the project is the layered architecture plus the scheduling engine
-Data layer Room and DataStore store tasks subjects and settings
-Domain layer TaskScheduler calculates priority and builds the daily plan
-UI layer Compose screens ViewModels and Navigation show the data and expose actions to the user
+### Phase 4: Planning domain
+11. Create domain models for daily planning
+12. Implement task priority algorithm and daily planner
+
+### Phase 5: App wiring
+13. Create Application class with repository initialization
+14. Add ViewModels with StateFlow for reactive UI
+15. Configure Navigation Compose with screen routes
+
+### Phase 6: UI and screens
+16. Build reusable TaskCard component with Material3
+17. Create HomeScreen with daily plan display
+18. Add task creation and editing screens with validation
+19. Implement SubjectsScreen with RGB color picker
+20. Create task details and history screens
+21. Add AllTasksScreen with advanced filtering and sorting
+22. Create SettingsScreen with study preferences
+
+### Phase 7: UX improvements and refinements
+23. Add search bar and alphabetical sorting to subjects
+24. Add task completion confirmation dialogs
+25. Implement visual indicators for overdue tasks
+26. Add in-progress status for tasks with visual indicators
+27. Add required field indicators and validation errors
+28. Display real subject names and colors in task cards
+29. Load default difficulty and time from settings
+30. Add comprehensive documentation and MIT license
