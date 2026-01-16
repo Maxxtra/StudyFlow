@@ -33,7 +33,6 @@ fun TaskCard(
 ) {
     var showConfirmDialog by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
     var showSuccessDialog by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-
     val isOverdue = task.deadline < System.currentTimeMillis() && !task.isCompleted
     val overdueColor = Color(0xFFFF5252)
 
