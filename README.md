@@ -1,4 +1,4 @@
-README_MD = """# StudyFlow
+# StudyFlow
 
 ## Overview
 StudyFlow is an Android school project built with Kotlin and Jetpack Compose. It is a smart study planner for students that helps organize subjects and academic tasks (homework, projects, exams) and generates an automatic daily plan based on task priority rather than a static to-do list.
