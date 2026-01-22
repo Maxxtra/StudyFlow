@@ -14,3 +14,4 @@ class Converters {
         return TaskType.valueOf(value)
     }
 }
+
