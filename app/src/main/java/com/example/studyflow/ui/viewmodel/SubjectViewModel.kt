@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class SubjectUiState(
-    val subjects: List<Subject> = emptyList(),
+    val allSubjects: List<Subject> = emptyList(),
+    val filteredSubjects: List<Subject> = emptyList(),
+    val searchQuery: String = "",
+    val sortAscending: Boolean = true,
     val isLoading: Boolean = true
 )
 
@@ -27,10 +30,50 @@ class SubjectViewModel(
         viewModelScope.launch {
             subjectRepository.allSubjects.collect { subjects ->
                 _uiState.update {
-                    it.copy(subjects = subjects, isLoading = false)
+                    it.copy(
+                        allSubjects = subjects,
+                        filteredSubjects = filterAndSortSubjects(subjects, it.searchQuery, it.sortAscending),
+                        isLoading = false
+                    )
                 }
             }
         }
+    }
+
+    fun updateSearchQuery(query: String) {
+        _uiState.update {
+            it.copy(
+                searchQuery = query,
+                filteredSubjects = filterAndSortSubjects(it.allSubjects, query, it.sortAscending)
+            )
+        }
+    }
+
+    fun toggleSortOrder() {
+        _uiState.update {
+            it.copy(
+                sortAscending = !it.sortAscending,
+                filteredSubjects = filterAndSortSubjects(it.allSubjects, it.searchQuery, !it.sortAscending)
+            )
+        }
+    }
+
+    private fun filterAndSortSubjects(
+        subjects: List<Subject>,
+        query: String,
+        ascending: Boolean
+    ): List<Subject> {
+        return subjects
+            .filter { subject ->
+                subject.name.contains(query, ignoreCase = true)
+            }
+            .let { list ->
+                if (ascending) {
+                    list.sortedBy { it.name.lowercase() }
+                } else {
+                    list.sortedByDescending { it.name.lowercase() }
+                }
+            }
     }
 
     fun addSubject(name: String, color: Long) {

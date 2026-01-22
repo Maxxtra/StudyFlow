@@ -8,7 +8,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import com.example.studyflow.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -24,36 +27,22 @@ fun SubjectsScreen(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showAddDialog by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
-    var sortAscending by remember { mutableStateOf(true) }
-
-    val filteredAndSortedSubjects = uiState.subjects
-        .filter { subject ->
-            subject.name.contains(searchQuery, ignoreCase = true)
-        }
-        .let { list ->
-            if (sortAscending) {
-                list.sortedBy { it.name.lowercase() }
-            } else {
-                list.sortedByDescending { it.name.lowercase() }
-            }
-        }
+    var showAddDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Subjects") },
+                title = { Text(stringResource(R.string.subjects_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Subject")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_subject))
             }
         }
     ) { padding ->
@@ -78,17 +67,17 @@ fun SubjectsScreen(
 
                 item {
                     OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
+                        value = uiState.searchQuery,
+                        onValueChange = { viewModel.updateSearchQuery(it) },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Search subjects...") },
+                        placeholder = { Text(stringResource(R.string.search_subjects)) },
                         leadingIcon = {
-                            Icon(Icons.Default.Search, contentDescription = "Search")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
                         },
                         trailingIcon = {
-                            if (searchQuery.isNotEmpty()) {
-                                IconButton(onClick = { searchQuery = "" }) {
-                                    Icon(Icons.Default.Close, contentDescription = "Clear")
+                            if (uiState.searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { viewModel.updateSearchQuery("") }) {
+                                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear))
                                 }
                             }
                         },
@@ -105,23 +94,23 @@ fun SubjectsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${filteredAndSortedSubjects.size} subject${if (filteredAndSortedSubjects.size != 1) "s" else ""}",
+                            text = "${uiState.filteredSubjects.size} subject${if (uiState.filteredSubjects.size != 1) "s" else ""}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.Bold
                         )
                         FilterChip(
                             selected = true,
-                            onClick = { sortAscending = !sortAscending },
+                            onClick = { viewModel.toggleSortOrder() },
                             label = {
                                 Text(
-                                    text = if (sortAscending) "A → Z" else "Z → A",
+                                    text = if (uiState.sortAscending) stringResource(R.string.sort_a_to_z) else stringResource(R.string.sort_z_to_a),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             },
                             leadingIcon = {
                                 Icon(
-                                    imageVector = if (sortAscending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                                    imageVector = if (uiState.sortAscending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                                     contentDescription = null,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -131,7 +120,7 @@ fun SubjectsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                if (uiState.subjects.isEmpty()) {
+                if (uiState.allSubjects.isEmpty()) {
                     item {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(
@@ -148,19 +137,19 @@ fun SubjectsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    text = "No Subjects Added",
+                                    text = stringResource(R.string.no_subjects_added),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "Add your first subject to get started",
+                                    text = stringResource(R.string.add_first_subject),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
                     }
-                } else if (filteredAndSortedSubjects.isEmpty()) {
+                } else if (uiState.filteredSubjects.isEmpty()) {
                     item {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(
@@ -177,12 +166,12 @@ fun SubjectsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    text = "No subjects found",
+                                    text = stringResource(R.string.no_subjects_found),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "Try a different search term",
+                                    text = stringResource(R.string.try_different_search),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -190,7 +179,7 @@ fun SubjectsScreen(
                         }
                     }
                 } else {
-                    items(filteredAndSortedSubjects) { subject ->
+                    items(uiState.filteredSubjects) { subject ->
                         Card(
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -221,7 +210,7 @@ fun SubjectsScreen(
                                 IconButton(onClick = { viewModel.deleteSubject(subject.id) }) {
                                     Icon(
                                         Icons.Default.Delete,
-                                        contentDescription = "Delete",
+                                        contentDescription = stringResource(R.string.delete),
                                         tint = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -261,19 +250,19 @@ fun AddSubjectDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add New Subject") },
+        title = { Text(stringResource(R.string.add_new_subject)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = subjectName,
                     onValueChange = { subjectName = it },
-                    label = { Text("Subject Name") },
+                    label = { Text(stringResource(R.string.subject_name)) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text("Color:", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.color), style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
@@ -322,12 +311,12 @@ fun AddSubjectDialog(
                 },
                 enabled = subjectName.isNotBlank()
             ) {
-                Text("Add")
+                Text(stringResource(R.string.add))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

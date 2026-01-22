@@ -10,8 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.studyflow.R
 import com.example.studyflow.ui.components.TaskCard
 import com.example.studyflow.ui.components.formatDate
 import com.example.studyflow.ui.viewmodel.MainViewModel
@@ -66,6 +68,80 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                // Holiday Banner
+                uiState.todayHolidayName?.let { holidayName ->
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Event,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.holiday_banner_title, holidayName),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                Button(
+                                    onClick = { viewModel.toggleRelaxedPlan() },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.tertiary,
+                                        contentColor = MaterialTheme.colorScheme.onTertiary
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = if (uiState.isRelaxedPlan) {
+                                            Icons.Default.RestartAlt
+                                        } else {
+                                            Icons.Default.WbSunny
+                                        },
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = if (uiState.isRelaxedPlan) {
+                                            stringResource(R.string.use_normal_plan)
+                                        } else {
+                                            stringResource(R.string.use_relaxed_plan)
+                                        }
+                                    )
+                                }
+
+                                if (uiState.isRelaxedPlan) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.relaxed_plan_active),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
 
                 uiState.dailyPlan?.let { plan ->
@@ -147,7 +223,7 @@ fun HomeScreen(
                         }
                     } else {
                         items(plan.tasks) { plannedTask ->
-                            val subject = subjectsState.subjects.find { it.id == plannedTask.task.subjectId }
+                            val subject = subjectsState.allSubjects.find { it.id == plannedTask.task.subjectId }
                             TaskCard(
                                 task = plannedTask.task,
                                 subjectColor = subject?.let { Color(it.color) } ?: Color.Gray,

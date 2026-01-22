@@ -9,8 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.studyflow.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,10 +41,10 @@ fun AllTasksScreen(
     val uiState by viewModel.uiState.collectAsState()
     val subjectsState by subjectViewModel.uiState.collectAsState()
 
-    var selectedFilter by remember { mutableStateOf(TaskFilter.ALL) }
-    var selectedSort by remember { mutableStateOf(TaskSort.DEADLINE_ASC) }
-    var selectedType by remember { mutableStateOf<TaskType?>(null) }
-    var selectedSubjectId by remember { mutableStateOf<Long?>(null) }
+    var selectedFilter by rememberSaveable { mutableStateOf(TaskFilter.ALL) }
+    var selectedSort by rememberSaveable { mutableStateOf(TaskSort.DEADLINE_ASC) }
+    var selectedType by rememberSaveable { mutableStateOf<TaskType?>(null) }
+    var selectedSubjectId by rememberSaveable { mutableStateOf<Long?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showTypeMenu by remember { mutableStateOf(false) }
     var showSubjectMenu by remember { mutableStateOf(false) }
@@ -77,18 +80,18 @@ fun AllTasksScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("All Tasks") },
+                title = { Text(stringResource(R.string.all_tasks_title)) },
                 actions = {
                     // Sort button
                     IconButton(onClick = { showSortMenu = true }) {
-                        Icon(Icons.Default.Sort, contentDescription = "Sort")
+                        Icon(Icons.Default.Sort, contentDescription = stringResource(R.string.sort_type))
                     }
                     DropdownMenu(
                         expanded = showSortMenu,
                         onDismissRequest = { showSortMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Deadline ↑") },
+                            text = { Text(stringResource(R.string.sort_deadline_asc)) },
                             onClick = {
                                 selectedSort = TaskSort.DEADLINE_ASC
                                 showSortMenu = false
@@ -100,7 +103,7 @@ fun AllTasksScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Deadline ↓") },
+                            text = { Text(stringResource(R.string.sort_deadline_desc)) },
                             onClick = {
                                 selectedSort = TaskSort.DEADLINE_DESC
                                 showSortMenu = false
@@ -112,7 +115,7 @@ fun AllTasksScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Priority") },
+                            text = { Text(stringResource(R.string.sort_priority)) },
                             onClick = {
                                 selectedSort = TaskSort.PRIORITY
                                 showSortMenu = false
@@ -124,7 +127,7 @@ fun AllTasksScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Difficulty") },
+                            text = { Text(stringResource(R.string.sort_difficulty)) },
                             onClick = {
                                 selectedSort = TaskSort.DIFFICULTY
                                 showSortMenu = false
@@ -136,7 +139,7 @@ fun AllTasksScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Created Date") },
+                            text = { Text(stringResource(R.string.sort_created_date)) },
                             onClick = {
                                 selectedSort = TaskSort.CREATED_DATE
                                 showSortMenu = false
@@ -148,7 +151,7 @@ fun AllTasksScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Type") },
+                            text = { Text(stringResource(R.string.sort_type)) },
                             onClick = {
                                 selectedSort = TaskSort.TYPE
                                 showSortMenu = false
@@ -243,12 +246,12 @@ fun AllTasksScreen(
                         FilterChip(
                             selected = selectedFilter == TaskFilter.ALL,
                             onClick = { selectedFilter = TaskFilter.ALL },
-                            label = { Text("All") }
+                            label = { Text(stringResource(R.string.filter_all)) }
                         )
                         FilterChip(
                             selected = selectedFilter == TaskFilter.ACTIVE,
                             onClick = { selectedFilter = TaskFilter.ACTIVE },
-                            label = { Text("Active") },
+                            label = { Text(stringResource(R.string.filter_active)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Circle, null, modifier = Modifier.size(16.dp))
                             }
@@ -256,7 +259,7 @@ fun AllTasksScreen(
                         FilterChip(
                             selected = selectedFilter == TaskFilter.IN_PROGRESS,
                             onClick = { selectedFilter = TaskFilter.IN_PROGRESS },
-                            label = { Text("In Progress") },
+                            label = { Text(stringResource(R.string.filter_in_progress)) },
                             leadingIcon = {
                                 Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(16.dp))
                             }
@@ -264,7 +267,7 @@ fun AllTasksScreen(
                         FilterChip(
                             selected = selectedFilter == TaskFilter.COMPLETED,
                             onClick = { selectedFilter = TaskFilter.COMPLETED },
-                            label = { Text("Completed") },
+                            label = { Text(stringResource(R.string.filter_completed)) },
                             leadingIcon = {
                                 Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(16.dp))
                             }
@@ -272,7 +275,7 @@ fun AllTasksScreen(
                         FilterChip(
                             selected = selectedFilter == TaskFilter.OVERDUE,
                             onClick = { selectedFilter = TaskFilter.OVERDUE },
-                            label = { Text("Overdue") },
+                            label = { Text(stringResource(R.string.filter_overdue)) },
                             leadingIcon = {
                                 Icon(Icons.Default.Warning, null, modifier = Modifier.size(16.dp))
                             }
@@ -280,7 +283,7 @@ fun AllTasksScreen(
                         FilterChip(
                             selected = selectedFilter == TaskFilter.UPCOMING,
                             onClick = { selectedFilter = TaskFilter.UPCOMING },
-                            label = { Text("Upcoming") },
+                            label = { Text(stringResource(R.string.filter_upcoming)) },
                             leadingIcon = {
                                 Icon(Icons.Default.CalendarToday, null, modifier = Modifier.size(16.dp))
                             }
@@ -302,11 +305,11 @@ fun AllTasksScreen(
                                 label = {
                                     Text(
                                         when (selectedType) {
-                                            TaskType.HOMEWORK -> "Homework"
-                                            TaskType.PROJECT -> "Project"
-                                            TaskType.EXAM -> "Exam"
-                                            TaskType.OTHER -> "Other"
-                                            null -> "All Types"
+                                            TaskType.HOMEWORK -> stringResource(R.string.task_type_homework)
+                                            TaskType.PROJECT -> stringResource(R.string.task_type_project)
+                                            TaskType.EXAM -> stringResource(R.string.task_type_exam)
+                                            TaskType.OTHER -> stringResource(R.string.task_type_other)
+                                            null -> stringResource(R.string.all_types)
                                         }
                                     )
                                 },
@@ -320,7 +323,7 @@ fun AllTasksScreen(
                                 onDismissRequest = { showTypeMenu = false }
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("All Types") },
+                                    text = { Text(stringResource(R.string.all_types)) },
                                     onClick = {
                                         selectedType = null
                                         showTypeMenu = false
@@ -332,7 +335,7 @@ fun AllTasksScreen(
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Homework") },
+                                    text = { Text(stringResource(R.string.task_type_homework)) },
                                     onClick = {
                                         selectedType = TaskType.HOMEWORK
                                         showTypeMenu = false
@@ -344,7 +347,7 @@ fun AllTasksScreen(
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Project") },
+                                    text = { Text(stringResource(R.string.task_type_project)) },
                                     onClick = {
                                         selectedType = TaskType.PROJECT
                                         showTypeMenu = false
@@ -356,7 +359,7 @@ fun AllTasksScreen(
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Exam") },
+                                    text = { Text(stringResource(R.string.task_type_exam)) },
                                     onClick = {
                                         selectedType = TaskType.EXAM
                                         showTypeMenu = false
@@ -368,7 +371,7 @@ fun AllTasksScreen(
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Other") },
+                                    text = { Text(stringResource(R.string.task_type_other)) },
                                     onClick = {
                                         selectedType = TaskType.OTHER
                                         showTypeMenu = false
@@ -389,7 +392,7 @@ fun AllTasksScreen(
                                 onClick = { showSubjectMenu = true },
                                 label = {
                                     Text(
-                                        subjectsState.subjects.find { it.id == selectedSubjectId }?.name
+                                        subjectsState.allSubjects.find { it.id == selectedSubjectId }?.name
                                             ?: "All Subjects"
                                     )
                                 },
@@ -403,7 +406,7 @@ fun AllTasksScreen(
                                 onDismissRequest = { showSubjectMenu = false }
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("All Subjects") },
+                                    text = { Text(stringResource(R.string.all_subjects)) },
                                     onClick = {
                                         selectedSubjectId = null
                                         showSubjectMenu = false
@@ -414,7 +417,7 @@ fun AllTasksScreen(
                                         }
                                     }
                                 )
-                                subjectsState.subjects.forEach { subject ->
+                                subjectsState.allSubjects.forEach { subject ->
                                     DropdownMenuItem(
                                         text = { Text(subject.name) },
                                         onClick = {
@@ -477,7 +480,7 @@ fun AllTasksScreen(
                     }
                 } else {
                     items(sortedTasks) { task ->
-                        val subject = subjectsState.subjects.find { it.id == task.subjectId }
+                        val subject = subjectsState.allSubjects.find { it.id == task.subjectId }
                         TaskCard(
                             task = task,
                             subjectColor = subject?.let { Color(it.color) } ?: Color.Gray,

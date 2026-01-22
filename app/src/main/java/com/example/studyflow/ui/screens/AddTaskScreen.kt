@@ -7,8 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.studyflow.R
 import com.example.studyflow.data.database.entities.TaskType
 import com.example.studyflow.ui.viewmodel.SubjectViewModel
 import com.example.studyflow.ui.viewmodel.TaskViewModel
@@ -24,7 +27,7 @@ fun AddTaskScreen(
 ) {
     val formState by viewModel.formState.collectAsState()
     val subjectsState by subjectViewModel.uiState.collectAsState()
-    var showDatePicker by remember { mutableStateOf(false) }
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.resetForm()
@@ -33,10 +36,10 @@ fun AddTaskScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add New Task") },
+                title = { Text(stringResource(R.string.add_new_task)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -53,19 +56,19 @@ fun AddTaskScreen(
             OutlinedTextField(
                 value = formState.title,
                 onValueChange = { viewModel.updateTitle(it) },
-                label = { Text("Title *") },
+                label = { Text(stringResource(R.string.title_required)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = formState.title.isBlank(),
                 supportingText = if (formState.title.isBlank()) {
-                    { Text("Required field") }
+                    { Text(stringResource(R.string.required_field)) }
                 } else null
             )
 
             OutlinedTextField(
                 value = formState.description,
                 onValueChange = { viewModel.updateDescription(it) },
-                label = { Text("Description (optional)") },
+                label = { Text(stringResource(R.string.description_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5
@@ -78,14 +81,14 @@ fun AddTaskScreen(
             ) {
                 OutlinedTextField(
                     value = when (formState.type) {
-                        TaskType.HOMEWORK -> "Homework"
-                        TaskType.PROJECT -> "Project"
-                        TaskType.EXAM -> "Exam"
-                        TaskType.OTHER -> "Other"
+                        TaskType.HOMEWORK -> stringResource(R.string.task_type_homework)
+                        TaskType.PROJECT -> stringResource(R.string.task_type_project)
+                        TaskType.EXAM -> stringResource(R.string.task_type_exam)
+                        TaskType.OTHER -> stringResource(R.string.task_type_other)
                     },
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Type") },
+                    label = { Text(stringResource(R.string.type_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -100,10 +103,10 @@ fun AddTaskScreen(
                             text = {
                                 Text(
                                     when (type) {
-                                        TaskType.HOMEWORK -> "Homework"
-                                        TaskType.PROJECT -> "Project"
-                                        TaskType.EXAM -> "Exam"
-                                        TaskType.OTHER -> "Other"
+                                        TaskType.HOMEWORK -> stringResource(R.string.task_type_homework)
+                                        TaskType.PROJECT -> stringResource(R.string.task_type_project)
+                                        TaskType.EXAM -> stringResource(R.string.task_type_exam)
+                                        TaskType.OTHER -> stringResource(R.string.task_type_other)
                                     }
                                 )
                             },
@@ -122,25 +125,25 @@ fun AddTaskScreen(
                 onExpandedChange = { expandedSubject = it }
             ) {
                 OutlinedTextField(
-                    value = subjectsState.subjects.find { it.id == formState.subjectId }?.name
-                        ?: "Select Subject",
+                    value = subjectsState.allSubjects.find { it.id == formState.subjectId }?.name
+                        ?: stringResource(R.string.select_subject),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Subject *") },
+                    label = { Text(stringResource(R.string.subject_required)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSubject) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(),
                     isError = formState.subjectId == null,
                     supportingText = if (formState.subjectId == null) {
-                        { Text("Required field - please select a subject") }
+                        { Text(stringResource(R.string.select_subject_required)) }
                     } else null
                 )
                 ExposedDropdownMenu(
                     expanded = expandedSubject,
                     onDismissRequest = { expandedSubject = false }
                 ) {
-                    subjectsState.subjects.forEach { subject ->
+                    subjectsState.allSubjects.forEach { subject ->
                         DropdownMenuItem(
                             text = { Text(subject.name) },
                             onClick = {
@@ -156,7 +159,7 @@ fun AddTaskScreen(
                 value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(formState.deadline)),
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Deadline") },
+                label = { Text(stringResource(R.string.deadline_label)) },
                 trailingIcon = {
                     IconButton(onClick = { showDatePicker = true }) {
                         Icon(Icons.Default.CalendarToday, contentDescription = null)
@@ -171,14 +174,14 @@ fun AddTaskScreen(
                 onValueChange = { value ->
                     value.toIntOrNull()?.let { viewModel.updateEstimatedTime(it) }
                 },
-                label = { Text("Estimated Time (minutes)") },
+                label = { Text(stringResource(R.string.estimated_time_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
             Column {
                 Text(
-                    text = "Difficulty: ${formState.difficulty}/5",
+                    text = stringResource(R.string.difficulty_label, formState.difficulty),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Slider(
@@ -198,7 +201,7 @@ fun AddTaskScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = formState.title.isNotBlank() && formState.subjectId != null
             ) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         }
     }
@@ -216,12 +219,12 @@ fun AddTaskScreen(
                     }
                     showDatePicker = false
                 }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
