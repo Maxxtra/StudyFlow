@@ -4,22 +4,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.studyflow.data.database.entities.StudyTask
 import com.example.studyflow.data.datastore.SettingsDataStore
+import com.example.studyflow.data.repository.HolidayRepository
 import com.example.studyflow.data.repository.StudyTaskRepository
 import com.example.studyflow.domain.model.DailyPlan
 import com.example.studyflow.domain.scheduler.TaskScheduler
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 data class MainUiState(
     val activeTasks: List<StudyTask> = emptyList(),
     val allTasks: List<StudyTask> = emptyList(),
     val dailyPlan: DailyPlan? = null,
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val todayHolidayName: String? = null,
+    val isRelaxedPlan: Boolean = false
 )
 
 class MainViewModel(
     private val taskRepository: StudyTaskRepository,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val holidayRepository: HolidayRepository
 ) : ViewModel() {
 
     private val taskScheduler = TaskScheduler()
@@ -29,6 +34,17 @@ class MainViewModel(
 
     init {
         loadData()
+        fetchHolidays()
+    }
+
+    private fun fetchHolidays() {
+        viewModelScope.launch {
+            val today = LocalDate.now()
+            holidayRepository.fetchHolidays(today.year)
+
+            val todayHoliday = holidayRepository.getTodayHoliday()
+            _uiState.update { it.copy(todayHolidayName = todayHoliday?.localName) }
+        }
     }
 
     private fun loadData() {
@@ -39,7 +55,11 @@ class MainViewModel(
             ) { allTasks, hours ->
                 _uiState.update { currentState ->
                     val activeTasks = allTasks.filter { !it.isCompleted }
-                    val dailyMinutes = hours * 60
+                    val dailyMinutes = if (currentState.isRelaxedPlan) {
+                        (hours * 60 * 0.5).toInt() // 50% reduction for holidays
+                    } else {
+                        hours * 60
+                    }
                     val plan = taskScheduler.generateDailyPlan(activeTasks, dailyMinutes)
 
                     activeTasks.forEach { task ->
@@ -57,6 +77,12 @@ class MainViewModel(
                     )
                 }
             }.collect()
+        }
+    }
+
+    fun toggleRelaxedPlan() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRelaxedPlan = !it.isRelaxedPlan) }
         }
     }
 

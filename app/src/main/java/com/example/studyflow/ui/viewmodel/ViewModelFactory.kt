@@ -3,17 +3,19 @@ package com.example.studyflow.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.studyflow.data.datastore.SettingsDataStore
+import com.example.studyflow.data.repository.HolidayRepository
 import com.example.studyflow.data.repository.StudyTaskRepository
 import com.example.studyflow.data.repository.SubjectRepository
 
 class MainViewModelFactory(
     private val taskRepository: StudyTaskRepository,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val holidayRepository: HolidayRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainViewModel(taskRepository, settingsDataStore) as T
+            return MainViewModel(taskRepository, settingsDataStore, holidayRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
