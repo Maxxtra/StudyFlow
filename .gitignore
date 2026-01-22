@@ -1,1 +1,7 @@
 .md
+.gradle/
+.idea/
+build/
+local.properties
+*.apk
+*.iml
