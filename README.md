@@ -5,7 +5,12 @@ StudyFlow is an Android school project built with Kotlin and Jetpack Compose. It
 
 This repository follows an incremental development approach. The commit history is intentionally structured to reflect step-by-step implementation (setup -> UI -> data -> domain -> features).
 
+Starting with v1.1.x, the project includes multiple bug fixes and architecture improvements (AppContainer for manual dependency injection, better ViewModel scoping, moving UI logic into ViewModels, improved state persistence with rememberSaveable, and migrating hardcoded UI strings to string resources). It also adds a minimal networking component (Retrofit) that retrieves Romanian public holidays from a REST API and displays a holiday banner on the Home screen, with an optional relaxed-plan mode for that day.
+
+This repository follows an incremental development approach. The commit history is intentionally structured to reflect step-by-step implementation (setup -> UI -> data -> domain -> features -> refinements).
+
 ## Current Release
+- v1.1.0 (bug fixes + architecture refactor + networking: public holidays)
 - v1.0.0 (initial functional release)
 
 ## Key Features
