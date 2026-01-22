@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.studyflow.ui.navigation.NavGraph
@@ -32,25 +33,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StudyFlowApp() {
     val application = androidx.compose.ui.platform.LocalContext.current.applicationContext as StudyFlowApplication
-
-    val mainViewModel: MainViewModel = viewModel(
-        factory = MainViewModelFactory(
-            application.taskRepository,
-            application.settingsDataStore
-        )
-    )
-
-    val subjectViewModel: SubjectViewModel = viewModel(
-        factory = SubjectViewModelFactory(application.subjectRepository)
-    )
-
-    val taskViewModel: TaskViewModel = viewModel(
-        factory = TaskViewModelFactory(application.taskRepository, application.settingsDataStore)
-    )
-
-    val settingsViewModel: SettingsViewModel = viewModel(
-        factory = SettingsViewModelFactory(application.settingsDataStore)
-    )
+    val appContainer = application.appContainer
 
     val navController = rememberNavController()
 
@@ -59,31 +42,31 @@ fun StudyFlowApp() {
             NavigationBar {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                    label = { Text("Home") },
+                    label = { Text(stringResource(R.string.nav_home)) },
                     selected = false,
                     onClick = { navController.navigate(Screen.Home.route) }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.List, contentDescription = null) },
-                    label = { Text("All Tasks") },
+                    label = { Text(stringResource(R.string.nav_all_tasks)) },
                     selected = false,
                     onClick = { navController.navigate(Screen.AllTasks.route) }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.School, contentDescription = null) },
-                    label = { Text("Subjects") },
+                    label = { Text(stringResource(R.string.nav_subjects)) },
                     selected = false,
                     onClick = { navController.navigate(Screen.Subjects.route) }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.History, contentDescription = null) },
-                    label = { Text("History") },
+                    label = { Text(stringResource(R.string.nav_history)) },
                     selected = false,
                     onClick = { navController.navigate(Screen.History.route) }
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                    label = { Text("Settings") },
+                    label = { Text(stringResource(R.string.nav_settings)) },
                     selected = false,
                     onClick = { navController.navigate(Screen.Settings.route) }
                 )
@@ -93,10 +76,7 @@ fun StudyFlowApp() {
         Box(modifier = Modifier.padding(innerPadding)) {
             NavGraph(
                 navController = navController,
-                mainViewModel = mainViewModel,
-                subjectViewModel = subjectViewModel,
-                taskViewModel = taskViewModel,
-                settingsViewModel = settingsViewModel
+                appContainer = appContainer
             )
         }
     }
