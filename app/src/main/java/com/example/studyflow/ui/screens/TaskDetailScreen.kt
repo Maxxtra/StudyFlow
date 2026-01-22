@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.example.studyflow.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.studyflow.data.database.entities.TaskType
@@ -33,17 +35,17 @@ fun TaskDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Task Details") },
+                title = { Text(stringResource(R.string.task_details)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     task?.let {
                         if (!it.isCompleted) {
                             IconButton(onClick = onNavigateToEdit) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_task))
                             }
                         }
                         IconButton(onClick = {
@@ -52,7 +54,7 @@ fun TaskDetailScreen(
                                 onNavigateBack()
                             }
                         }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
                         }
                     }
                 }
@@ -66,7 +68,7 @@ fun TaskDetailScreen(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Task not found")
+                Text(stringResource(R.string.task_not_found))
             }
         } else {
             Column(

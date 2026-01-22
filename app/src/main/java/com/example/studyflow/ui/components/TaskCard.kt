@@ -13,6 +13,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.example.studyflow.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.studyflow.data.database.entities.StudyTask
@@ -95,7 +97,7 @@ fun TaskCard(
                     if (isOverdue) {
                         AssistChip(
                             onClick = {},
-                            label = { Text("OVERDUE", style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(R.string.overdue_label), style = MaterialTheme.typography.labelSmall) },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Warning,
@@ -113,7 +115,7 @@ fun TaskCard(
                     } else if (task.inProgress && !task.isCompleted) {
                         AssistChip(
                             onClick = {},
-                            label = { Text("In Progress", style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(R.string.in_progress_label), style = MaterialTheme.typography.labelSmall) },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.PlayArrow,
@@ -224,8 +226,8 @@ fun TaskCard(
                     modifier = Modifier.size(48.dp)
                 )
             },
-            title = { Text("Complete Task?") },
-            text = { Text("Are you sure you want to mark \"${task.title}\" as completed?") },
+            title = { Text(stringResource(R.string.complete_task_title)) },
+            text = { Text(stringResource(R.string.complete_task_message, task.title)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -234,12 +236,12 @@ fun TaskCard(
                         showSuccessDialog = true
                     }
                 ) {
-                    Text("Yes, Complete")
+                    Text(stringResource(R.string.yes_complete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showConfirmDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -256,11 +258,11 @@ fun TaskCard(
                     modifier = Modifier.size(64.dp)
                 )
             },
-            title = { Text("Task Completed!") },
-            text = { Text("Great job! You've successfully completed \"${task.title}\".") },
+            title = { Text(stringResource(R.string.task_completed_title)) },
+            text = { Text(stringResource(R.string.task_completed_message, task.title)) },
             confirmButton = {
                 Button(onClick = { showSuccessDialog = false }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             }
         )
